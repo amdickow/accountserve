@@ -20,7 +20,7 @@ PID := /tmp/.$(PROJECTNAME).pid
 MKFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
 MKFILE_DIR := $(dir $(MKFILE_PATH))
 
-.PHONY: start-server stop-server go-build go-run go-test  ${BUILD_DIR}
+.PHONY: start-server stop-server go-build go-run go-test create-k8s-deployment deploy-k8s undeploy-k8s ${BUILD_DIR}
 
 all: go-build
 
@@ -46,10 +46,24 @@ go-test: go-build
 	go test ./...
 
 build-docker-image: go-build-amd64-linux
-	docker build -t microservice-example/accountservice ${MKFILE_DIR}
+	docker build -t localhost:5000/microservice-example/accountservice ${MKFILE_DIR}
+
+release-docker-image: build-docker-image
+	docker push localhost:5000/microservice-example/accountservice
 
 run-docker: build-docker-image
-	docker run -p 127.0.0.1:6767:6767 --rm microservice-example/accountservice
+	docker run -p 127.0.0.1:6767:6767 --rm localhost:5000/microservice-example/accountservice
+
+
+create-k8s-deployment:
+	kubectl create -f deployment/k8s_minikube/accountservice.yaml
+
+deploy-k8s: create-k8s-deployment
+	@$(eval EXTERNAL_IP:=$(shell ./scripts/check_and_wait_for_deployment_external_ip.sh accountservice-service))
+	echo "Deployment is available on: ${EXTERNAL_IP}"
+
+undeploy-k8s:
+	kubectl delete -f deployment/k8s_minikube/accountservice.yaml
 
 ${BUILD_DIR}:
 	mkdir -p ${BUILD_DIR}
