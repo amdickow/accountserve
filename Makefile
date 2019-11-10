@@ -14,7 +14,7 @@ STDERR := /tmp/.$(PROJECTNAME)-stderr.txt
 # PID file will keep the process id of the server
 PID := /tmp/.$(PROJECTNAME).pid
 
-.PHONY: start-server stop-server go-build go-run  ${BUILD_DIR}
+.PHONY: start-server stop-server go-build go-run go-test  ${BUILD_DIR}
 
 all: go-build
 
@@ -32,6 +32,9 @@ go-build: ${BUILD_DIR}
 
 go-run: go-build
 	go run *.go
+
+go-test: go-build
+	go test ./...
 
 ${BUILD_DIR}:
 	mkdir -p ${BUILD_DIR}
