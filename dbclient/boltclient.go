@@ -14,6 +14,7 @@ type IBoltClient interface {
 	OpenBoltDb()
 	QueryAccount(accountId string) (model.Account, error)
 	Seed()
+	Check() bool
 }
 
 // Real implementation
@@ -101,4 +102,9 @@ func (bc *BoltClient) seedAccounts() {
 		})
 	}
 	fmt.Printf("Seeded %v fake accounts...\n", total)
+}
+
+// Naive healthcheck, just makes sure the DB connection has been initialized.
+func (bc *BoltClient) Check() bool {
+	return bc.boltDB != nil
 }
