@@ -2,7 +2,7 @@
 # Will run forever...
 external_ip=""
 while [ -z $external_ip ]; do
-  echo "Waiting for deployment..." >&2
+  echo "Waiting for deployment...make sure you have run \'minikube tunnel\'" >&2
   external_ip=$(kubectl get service/$1 --template="{{range .status.loadBalancer.ingress}}{{.ip}}{{end}}")
   [ -z "$external_ip" ] && sleep 10
 done
