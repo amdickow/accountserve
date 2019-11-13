@@ -20,7 +20,7 @@ PID := /tmp/.$(PROJECTNAME).pid
 MKFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
 MKFILE_DIR := $(dir $(MKFILE_PATH))
 
-.PHONY: start-server stop-server go-build go-run go-test create-k8s-deployment deploy-k8s undeploy-k8s ${BUILD_DIR}
+.PHONY: start-server stop-server go-build go-run go-test run-docker create-docker-network deploy-dc undeploy-dc create-k8s-deployment deploy-k8s undeploy-k8s ${BUILD_DIR}
 
 all: go-build
 
@@ -54,6 +54,14 @@ release-docker-image: build-docker-image
 run-docker: build-docker-image
 	docker run -p 127.0.0.1:6767:6767 --rm localhost:5000/microservice-example/accountservice
 
+create-docker-network:
+	docker network create microservice-example-network
+
+deploy-dc: create-docker-network
+	docker-compose -f deployment/docker-compose/docker-compose.yml up -d
+
+undeploy-dc:
+	docker-compose -f deployment/docker-compose/docker-compose.yml stop
 
 create-k8s-deployment:
 	kubectl create -f deployment/k8s_minikube/accountservice.yaml

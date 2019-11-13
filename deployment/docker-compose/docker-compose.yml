@@ -1,0 +1,19 @@
+version: "3.7"
+
+services:
+  accountservice:
+    image: localhost:5000/microservice-example/accountservice
+    ports:
+      - 6767:6767
+    environment:
+      ENVIRONMENT: "test"
+    restart: unless-stopped
+    deploy:
+      mode: replicated
+      replicas: 1
+    networks:
+      - microservice-example-network
+
+networks:
+  microservice-example-network:
+    external: true
